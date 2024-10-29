@@ -1,14 +1,14 @@
--- Comentário de linha
-
+-- Comentário
 --[[
-Comentário de bloco
-que pode ter várias linhas
-]]
+    Comentário com
+    quebra de linha
+]]-- 
 
-y = "Texto com escape: \n Nova linha"
+i = 1
+while a < 10 do
+  i = i + 1
+end
 
-x = 0
-while x < 10 do
-    print(x)
-    x = x + 1
+function funcao(parametro)
+    return "retorno da funçao"
 end

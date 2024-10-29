@@ -33,9 +33,8 @@ typedef struct {
     int current_char;
     int line;
     int column;
-    int debug_mode;
+    int debug_mode; 
 } LexerState;
-
 
 /**
  * Inicializa o lexer com o arquivo fornecido.
@@ -58,6 +57,27 @@ Token lexer_get_next_token(LexerState *lexer);
  *
  * @param token Token a ser impresso.
  */
+void token_print(Token token);/**
+ * Inicializa o lexer com o arquivo fornecido.
+ *
+ * @param lexer Ponteiro para o estado do lexer.
+ * @param file Arquivo a ser analisado.
+ */
+void lexer_init(LexerState *lexer, FILE *file);
+
+/**
+ * Obtém o próximo token do arquivo.
+ *
+ * @param lexer Ponteiro para o estado do lexer.
+ * @return Token obtido.
+ */
+Token lexer_get_next_token(LexerState *lexer);
+
+/**
+ * Imprime informações sobre o token (para depuração).
+ *
+ * @param token Token a ser impresso.
+ */
 void token_print(Token token);
 
-#endif 
+#endif
