@@ -17,6 +17,7 @@ typedef enum {
     TOKEN_BRACE_OPEN,
     TOKEN_BRACE_CLOSE,
     TOKEN_SEMICOLON,
+    TOKEN_COLON,
     TOKEN_COMMA,
     TOKEN_UNKNOWN
 } TokenType;

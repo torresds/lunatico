@@ -1,4 +1,3 @@
-// main.c
 #include "lexer.h"
 #include "parser.h"
 #include <string.h>
@@ -8,7 +7,6 @@ int main(int argc, char *argv[]) {
     int test_lexer = 0;
     char *filename = NULL;
 
-    // Processar argumentos da linha de comando
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--debug") == 0) {
             debug_mode = 1;
@@ -32,17 +30,15 @@ int main(int argc, char *argv[]) {
 
     LexerState lexer;
     lexer_init(&lexer, file);
-    lexer.debug_mode = debug_mode; // Passa o modo de depuração para o lexer
+    lexer.debug_mode = debug_mode;
 
     if (test_lexer) {
-        // Testar o lexer individualmente
         Token token;
         do {
             token = lexer_get_next_token(&lexer);
             token_print(token);
         } while (token.type != TOKEN_EOF);
     } else {
-        // Executar o parser normalmente
         ParserState parser;
         parser_init(&parser, &lexer);
         parser.debug_mode = debug_mode;

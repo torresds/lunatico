@@ -5,7 +5,7 @@
 #include <ctype.h>
 
 const char *keywords[] = {
-    "if", "then", "else", "end", "function", "return", "while", "do", NULL
+    "if", "then", "else", "end", "function", "return", "while", "do", "local", NULL
 };
 
 void lexer_init(LexerState *lexer, FILE *file) {
@@ -16,7 +16,6 @@ void lexer_init(LexerState *lexer, FILE *file) {
     lexer->debug_mode = 0; 
 }
 
-// Avança para o próximo caractere
 void lexer_advance(LexerState *lexer) {
     if (lexer->current_char == '\n') {
         lexer->line++;
@@ -26,63 +25,43 @@ void lexer_advance(LexerState *lexer) {
     lexer->column++;
 }
 
-void lexer_skip_whitespace(LexerState *lexer)
-{
-    while (isspace(lexer->current_char))
-    {
+void lexer_skip_whitespace(LexerState *lexer) {
+    while (isspace(lexer->current_char)) {
         lexer_advance(lexer);
     }
 }
 
-void lexer_skip_comment(LexerState *lexer)
-{
-    if (lexer->current_char == '-')
-    {
+void lexer_skip_comment(LexerState *lexer) {
+    if (lexer->current_char == '-') {
         lexer_advance(lexer);
-        if (lexer->current_char == '-')
-        {
+        if (lexer->current_char == '-') {
             lexer_advance(lexer);
-            if (lexer->current_char == '[')
-            {
+            if (lexer->current_char == '[') {
                 lexer_advance(lexer);
-                if (lexer->current_char == '[')
-                {
+                if (lexer->current_char == '[') {
                     lexer_advance(lexer);
-                    while (lexer->current_char != EOF)
-                    {
-                        if (lexer->current_char == ']')
-                        {
+                    while (lexer->current_char != EOF) {
+                        if (lexer->current_char == ']') {
                             lexer_advance(lexer);
-                            if (lexer->current_char == ']')
-                            {
+                            if (lexer->current_char == ']') {
                                 lexer_advance(lexer);
                                 break;
                             }
-                        }
-                        else
-                        {
+                        } else {
                             lexer_advance(lexer);
                         }
                     }
-                }
-                else
-                {
-                    while (lexer->current_char != '\n' && lexer->current_char != EOF)
-                    {
+                } else {
+                    while (lexer->current_char != '\n' && lexer->current_char != EOF) {
                         lexer_advance(lexer);
                     }
                 }
-            }
-            else
-            {
-                while (lexer->current_char != '\n' && lexer->current_char != EOF)
-                {
+            } else {
+                while (lexer->current_char != '\n' && lexer->current_char != EOF) {
                     lexer_advance(lexer);
                 }
             }
-        }
-        else
-        {
+        } else {
             ungetc(lexer->current_char, lexer->file);
             lexer->current_char = '-';
             lexer->column--;
@@ -90,8 +69,6 @@ void lexer_skip_comment(LexerState *lexer)
     }
 }
 
-
-// Verifica se uma string é uma palavra-chave
 int is_keyword(const char *str) {
     for (int i = 0; keywords[i] != NULL; i++) {
         if (strcmp(str, keywords[i]) == 0)
@@ -104,17 +81,14 @@ Token lexer_get_next_token(LexerState *lexer) {
     Token token;
     token.line = lexer->line;
     token.column = lexer->column;
-    if (lexer->debug_mode)
-    {
+    if (lexer->debug_mode) {
         printf("[Lexer] Iniciando lexer_get_next_token\n");
     }
-    while (1)
-    {
+    while (1) {
         lexer_skip_whitespace(lexer);
         lexer_skip_comment(lexer);
 
-        if (!isspace(lexer->current_char) && lexer->current_char != '-')
-        {
+        if (!isspace(lexer->current_char) && lexer->current_char != '-') {
             break;
         }
     }
@@ -136,16 +110,11 @@ Token lexer_get_next_token(LexerState *lexer) {
         }
         buffer[length] = '\0';
 
-        if (is_keyword(buffer)) {
-            token.type = TOKEN_KEYWORD;
-        } else {
-            token.type = TOKEN_IDENTIFIER;
-        }
+        token.type = is_keyword(buffer) ? TOKEN_KEYWORD : TOKEN_IDENTIFIER;
         strcpy(token.value, buffer);
         return token;
     }
 
-    // Números
     if (isdigit(lexer->current_char)) {
         int length = 0;
         char buffer[MAX_TOKEN_LEN] = {0};
@@ -161,9 +130,8 @@ Token lexer_get_next_token(LexerState *lexer) {
         return token;
     }
 
-    // Strings
     if (lexer->current_char == '"') {
-        lexer_advance(lexer); // Avança o '"'
+        lexer_advance(lexer);
         int length = 0;
         char buffer[MAX_TOKEN_LEN] = {0};
         while (lexer->current_char != '"' && lexer->current_char != EOF) {
@@ -173,7 +141,7 @@ Token lexer_get_next_token(LexerState *lexer) {
             lexer_advance(lexer);
         }
         if (lexer->current_char == '"') {
-            lexer_advance(lexer); // Avança o '"'
+            lexer_advance(lexer);
         } else {
             fprintf(stderr, "Erro léxico: String não terminada na linha %d, coluna %d\n", lexer->line, lexer->column);
             exit(EXIT_FAILURE);
@@ -184,30 +152,27 @@ Token lexer_get_next_token(LexerState *lexer) {
         return token;
     }
 
-    // Operadores e símbolos
     switch (lexer->current_char) {
         case '+': case '-': case '*': case '/': case '%':
-        case '=': case '~': case '<': case '>':
-            {
-                int length = 0;
-                char buffer[3] = {0};
+        case '=': case '~': case '<': case '>': {
+            int length = 0;
+            char buffer[3] = {0};
+            buffer[length++] = lexer->current_char;
+            lexer_advance(lexer);
+
+            if ((buffer[0] == '=' && lexer->current_char == '=') ||
+                (buffer[0] == '~' && lexer->current_char == '=') ||
+                (buffer[0] == '<' && lexer->current_char == '=') ||
+                (buffer[0] == '>' && lexer->current_char == '=')) {
                 buffer[length++] = lexer->current_char;
                 lexer_advance(lexer);
-
-                // Verifica operadores de dois caracteres (e.g., '==', '~=', '<=', '>=')
-                if ((buffer[0] == '=' && lexer->current_char == '=') ||
-                    (buffer[0] == '~' && lexer->current_char == '=') ||
-                    (buffer[0] == '<' && lexer->current_char == '=') ||
-                    (buffer[0] == '>' && lexer->current_char == '=')) {
-                    buffer[length++] = lexer->current_char;
-                    lexer_advance(lexer);
-                }
-
-                buffer[length] = '\0';
-                token.type = TOKEN_OPERATOR;
-                strcpy(token.value, buffer);
-                return token;
             }
+
+            buffer[length] = '\0';
+            token.type = TOKEN_OPERATOR;
+            strcpy(token.value, buffer);
+            return token;
+        }
         case '(':
             token.type = TOKEN_PAREN_OPEN;
             strcpy(token.value, "(");
@@ -226,6 +191,11 @@ Token lexer_get_next_token(LexerState *lexer) {
         case ';':
             token.type = TOKEN_SEMICOLON;
             strcpy(token.value, ";");
+            lexer_advance(lexer);
+            return token;
+        case ':':
+            token.type = TOKEN_COLON;
+            strcpy(token.value, ":");
             lexer_advance(lexer);
             return token;
         default:

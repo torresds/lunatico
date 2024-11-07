@@ -18,9 +18,14 @@ typedef struct SymbolTable {
 } SymbolTable;
 
 SymbolTable *create_symbol_table(int size, SymbolTable *parent);
+
 void free_symbol_table(SymbolTable *table);
 
 void symbol_table_add(SymbolTable *table, const char *name, DataType type);
+
 Symbol *symbol_table_lookup(SymbolTable *table, const char *name);
+
+void symbol_table_exit_scope(SymbolTable *table);
+unsigned int symbol_hash(const char *name, int size);
 
 #endif 

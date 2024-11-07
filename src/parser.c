@@ -416,6 +416,7 @@ ASTNode *parse_function_call(ParserState *parser)
     return create_function_call_node(token.value, arguments, arg_count);
 }
 
+
 // Parsea uma declaração de função
 ASTNode *parse_function_declaration(ParserState *parser)
 {
@@ -525,6 +526,59 @@ ASTNode *parse_return_statement(ParserState *parser)
     return node;
 }
 
+ASTNode *parse_variable_declaration(ParserState *parser)
+{
+    if (parser->debug_mode)
+    {
+        printf("[Parser] Entrando em parse_variable_declaration\n");
+    }
+
+    parser_eat(parser, TOKEN_KEYWORD); 
+
+    if (parser->current_token.type != TOKEN_IDENTIFIER)
+    {
+        fprintf(stderr, "Erro de sintaxe: Esperado nome de variável após 'local' na linha %d, coluna %d\n",
+                parser->current_token.line, parser->current_token.column);
+        exit(EXIT_FAILURE);
+    }
+
+    char variable_name[MAX_TOKEN_LEN];
+    strncpy(variable_name, parser->current_token.value, MAX_TOKEN_LEN);
+    parser_eat(parser, TOKEN_IDENTIFIER);
+
+    char type_name[MAX_TOKEN_LEN] = {0};
+    if (parser->current_token.type == TOKEN_COLON)
+    {
+        parser_eat(parser, TOKEN_COLON);
+
+        if (parser->current_token.type != TOKEN_IDENTIFIER)
+        {
+            fprintf(stderr, "Erro de sintaxe: Esperado nome de tipo após ':' na linha %d, coluna %d\n",
+                    parser->current_token.line, parser->current_token.column);
+            exit(EXIT_FAILURE);
+        }
+
+        strncpy(type_name, parser->current_token.value, MAX_TOKEN_LEN);
+        parser_eat(parser, TOKEN_IDENTIFIER);
+    }
+
+    ASTNode *expression = NULL;
+    if (parser->current_token.type == TOKEN_OPERATOR && strcmp(parser->current_token.value, "=") == 0)
+    {
+        parser_eat(parser, TOKEN_OPERATOR); // '='
+        expression = parse_expression(parser);
+    }
+
+    ASTNode *node = create_variable_declaration_node(variable_name, type_name, expression);
+
+    if (parser->debug_mode)
+    {
+        printf("[Parser] Saindo de parse_variable_declaration\n");
+    }
+
+    return node;
+}
+
 ASTNode *parse_statement(ParserState *parser)
 {
     if (parser->debug_mode)
@@ -537,6 +591,9 @@ ASTNode *parse_statement(ParserState *parser)
         if (strcmp(parser->current_token.value, "if") == 0)
         {
             return parse_if_statement(parser);
+        }
+        else if(strcmp(parser->current_token.value, "local") == 0) {
+             return parse_variable_declaration(parser);
         }
         else if (strcmp(parser->current_token.value, "while") == 0)
         {
