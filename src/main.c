@@ -1,3 +1,4 @@
+#include "semantic.h"
 #include "lexer.h"
 #include "parser.h"
 #include <string.h>
@@ -46,7 +47,9 @@ int main(int argc, char *argv[]) {
         ASTNode *ast = parse(&parser);
 
         print_ast(ast, 0);
-
+        semantic_check(ast);
+        print_ast(ast, 0);
+        printf("Análise semântica concluída com sucesso.\n");
         free_ast(ast);
     }
 
