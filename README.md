@@ -1,37 +1,76 @@
-# Lunatico 
-**Lunatico** é um compilador para a linguagem Lua, escrito em C. Um projeto escrito totalmente como hobby, para aprender mais sobre linguagens.
+# 🌙 Luna
 
-## Requisitos
-- **Compilador C**: GCC ou compatível com o padrão C99.
-- **Make**: Para compilar o projeto usando o Makefile.
+**Luna** is a lightweight, statically-typed programming language with type inference, built entirely in C. Inspired by the simplicity and syntax of Lua, Luna introduces a type-safe, minimalist model with modern programming constructs and explicit semantics.
 
-## Uso
+## 🎯 Goal
+The project is built as a personal exploration of compiler construction and programming language design. It is not intended as a production tool, but as a learning environment to prototype features, understand type systems, and build a language from the ground up.
+
+## 💡Philosophy
+
+- **Statically typed**: All expressions are type-checked at compile time.
+- **Type inference**: Less boilerplate, smarter typing.
+- **Lua-inspired syntax**: Familiar, clean, and easy to read.
+- **Safe scoping**: Lexical scope with declaration-before-use enforcement.
+- **Functional-friendly**: Functions are first-class values with inferred signatures.
+
+## 📄 Example code
+
+```lua
+local x: number = 10
+
+function add(a: number, b: number)
+    return a + b
+end
+
+local result = add(x, 5)
+````
+
+## 📦 Requirements
+
+* C compiler (GCC or compatible, C99 standard)
+* `make`
+
+## ⚙️ Building
+
 ```bash
-./lunatico [opções] <arquivo.lua>
-```
-### Opções
-- `--debug`: Ativa o modo de depuração, exibindo mensagens detalhadas durante a análise léxica e sintática.
-- `--lexer`: Testa o lexer individualmente, imprimindo todos os tokens identificados no arquivo de entrada.
-
-## Estrutura do Projeto
-```makefile
-lunatico/
-├── include/ # Contém os arquivos header (.h) com declarações e definições compartilhadas.
-│   ├── lexer.h 
-│   └── parser.h
-├── src/
-│   ├── lexer.c
-│   ├── parser.c
-│   └── main.c
-├── Makefile
-├── teste.lua     # Código Lua de exemplo para teste
-└── README.md     # Este arquivo
+make
 ```
 
-## 🚧 TODO List
-- [ ] Análise Semântica
-  - [ ] Verificação de Tipos
-  - [ ] Resolução de Identificadores e Escopos
-- [ ] Geração de código
-  - [ ] Geração de Código Intermediário
-  - [ ] Geração de Código de Máquina
+## 🚀 Running
+
+```bash
+./luna [options] <file.luna>
+```
+
+### Options
+
+* `--debug` → Enables verbose output (lexer/parser traces)
+* `--lexer` → Tokenizes input and prints all tokens
+
+## 🗂 Project Structure
+
+```
+luna/
+├── include/        # Header files (AST, Lexer, Parser, Types, Semantics)
+├── src/            # Compiler source files
+├── teste.luna      # Sample Luna program
+├── Makefile        # Build system
+└── README.md       # This file
+```
+
+## 🚧 Roadmap
+
+### ✅ Done
+
+* [x] Lexer and tokenizer
+* [x] Recursive-descent parser
+* [x] Abstract Syntax Tree (AST)
+* [x] Type inference and semantic analysis
+* [x] Scoped environments with shadowing
+* [x] AST pretty-printing with types
+
+### 🧪 Soon
+
+* [ ] Intermediate Representation (IR)
+* [ ] Stack-based Virtual Machine (VM)
+* [ ] Code generation backend
